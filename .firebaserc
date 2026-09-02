@@ -1,0 +1,6 @@
+{
+  "projects": {
+    "default": "scenario-ba26a",
+    "prod": "scenario-prod-491c"
+  }
+}

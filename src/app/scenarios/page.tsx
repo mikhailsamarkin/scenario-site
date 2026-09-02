@@ -1,19 +1,10 @@
-import { db } from '@/lib/firebase-admin';
-import Link from 'next/link';
-
-export default async function ScenariosListPage() {
-  const snapshot = await db().collection('scenarios').get();
-  const scenarios = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-
+export default function ScenariosListPage() {
   return (
     <main style={{ padding: '2rem', maxWidth: 800, margin: '0 auto' }}>
       <h1>Сценарии</h1>
+      <p>Список сценариев (данные можно подгружать с клиента через Firebase SDK).</p>
       <ul>
-        {scenarios.map((s: { id: string; title?: string }) => (
-          <li key={s.id}>
-            <Link href={`/scenarios/${s.id}`}>{s.title ?? s.id}</Link>
-          </li>
-        ))}
+        {/* Добавьте ссылки на сценарии или подгрузку из Firestore на клиенте */}
       </ul>
     </main>
   );

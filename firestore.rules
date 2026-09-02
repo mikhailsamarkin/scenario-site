@@ -1,0 +1,11 @@
+rules_version = '2';
+
+// Временные закрытые правила по умолчанию (шаг 2 US-E0-02).
+// Настоящие правила публичного чтения — ADR-011 (отдельная задача).
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

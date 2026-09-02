@@ -1,0 +1,51 @@
+name: Daily Push (11:00 MSK)
+
+# Замена Cloud Scheduler (A-7): ежедневный push в 11:00 МСК.
+# Cloud Scheduler и Cloud Functions требуют Blaze — недоступны на Spark,
+# поэтому используем GitHub Actions cron + firebase-admin напрямую к Firestore/FCM.
+#
+# Требования:
+# - Service account JSON (Firebase Admin SDK) в GitHub Secret: FIREBASE_SERVICE_ACCOUNT.
+#   Создать: Firebase Console → Project settings → Service accounts → Generate new private key.
+#   Роли: Cloud Functions Admin не нужен; достаточно чтения Firestore + отправки FCM
+#   (роль Firebase Admin / Cloud Messaging Admin).
+# - FCM_TOPIC (опционально, default 'daily').
+#
+# Ограничение GitHub: cron отключается для репозиториев без активности 60 дней.
+
+on:
+  schedule:
+    # 08:00 UTC = 11:00 МСК (Europe/Moscow, UTC+3)
+    - cron: '0 8 * * *'
+  workflow_dispatch: {} # ручной запуск для проверки
+
+jobs:
+  daily-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Write service account
+        env:
+          SA_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          if [ -z "$SA_JSON" ]; then
+            echo "::error::FIREBASE_SERVICE_ACCOUNT not configured"
+            exit 1
+          fi
+          echo "$SA_JSON" > /tmp/firebase-sa.json
+
+      - name: Run daily push
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: /tmp/firebase-sa.json
+          FCM_TOPIC: ${{ vars.FCM_TOPIC }}
+        run: node scripts/daily-push.mjs
