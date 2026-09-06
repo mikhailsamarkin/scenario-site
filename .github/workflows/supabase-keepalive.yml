@@ -1,7 +1,8 @@
 name: Supabase Keep-Alive
 
 # Keep-alive для free-tier Supabase (dev + prod): ежедневный запрос к БД через
-# PostgREST, чтобы проекты не попадали под авто-паузу после 7 дней без активности.
+# Storage API (POST /storage/v1/object/list/games), чтобы проекты не попадали
+# под авто-паузу после 7 дней без активности.
 #
 # Требования:
 # - GitHub Secrets: SUPABASE_URL_DEV, SUPABASE_ANON_KEY_DEV,
