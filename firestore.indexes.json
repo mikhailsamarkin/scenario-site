@@ -1,51 +1,13 @@
 {
-  // Example (Standard Edition):
+  // Индексы Firestore (SP-E0-01).
   //
-  // "indexes": [
-  //   {
-  //     "collectionGroup": "widgets",
-  //     "queryScope": "COLLECTION",
-  //     "fields": [
-  //       { "fieldPath": "foo", "arrayConfig": "CONTAINS" },
-  //       { "fieldPath": "bar", "mode": "DESCENDING" }
-  //     ]
-  //   },
+  // Все публичные чтения идут по КОНКРЕТНОМУ документу (getDoc):
+  //   home_feed/main, semantic_groups_public/{id}, scenario_public/{scenarioId},
+  //   game_public/{gameId}, sitemap_public/main
+  // поэтому составные индексы не требуются (A-11: one-shot get).
   //
-  //  "fieldOverrides": [
-  //    {
-  //      "collectionGroup": "widgets",
-  //      "fieldPath": "baz",
-  //      "indexes": [
-  //        { "order": "ASCENDING", "queryScope": "COLLECTION" }
-  //      ]
-  //    },
-  //   ]
-  // ]
-  //
-  // Example (Enterprise Edition):
-  //
-  // "indexes": [
-  //   {
-  //     "collectionGroup": "reviews",
-  //     "queryScope": "COLLECTION_GROUP",
-  //     "apiScope": "MONGODB_COMPATIBLE_API",
-  //     "density": "DENSE",
-  //     "multikey": false,
-  //     "fields": [
-  //       { "fieldPath": "baz", "mode": "ASCENDING" }
-  //     ]
-  //   },
-  //   {
-  //     "collectionGroup": "items",
-  //     "queryScope": "COLLECTION_GROUP",
-  //     "apiScope": "MONGODB_COMPATIBLE_API",
-  //     "density": "SPARSE_ANY",
-  //     "multikey": true,
-  //     "fields": [
-  //       { "fieldPath": "baz", "mode": "ASCENDING" }
-  //     ]
-  //   },
-  // ]
+  // Если в будущем появятся запросы по коллекциям (например, выборка
+  // опубликованных сценариев по полю), индексы добавляются здесь по ADR-010.
   "indexes": [],
   "fieldOverrides": []
 }

@@ -1,9 +1,60 @@
 rules_version = '2';
 
-// Временные закрытые правила по умолчанию (шаг 2 US-E0-02).
-// Настоящие правила публичного чтения — ADR-011 (отдельная задача).
+// Firestore Security Rules (SP-E0-01, A-38).
+//
+// Принцип:
+//   - Источник правды (games, scenarios, semantic_groups,
+//     scenario_semantic_groups, scenario_games) ЗАКРЫТ для клиентского read
+//     и write. Запись — только service account админки/функций (A-38).
+//   - Публичные агрегаты (home_feed, semantic_groups_public,
+//     scenario_public, game_public, sitemap_public) — read-only для всех
+//     клиентов; write — только service account.
+//
+// Деплой правил в прод — ADR-011 (отдельная задача). До деплоя Firestore
+// остаётся закрытым целиком (см. историю: временные правила US-E0-02).
+
 service cloud.firestore {
   match /databases/{database}/documents {
+    // Источник правды: закрыт для клиентов (A-38).
+    match /games/{document=**} {
+      allow read, write: if false;
+    }
+    match /scenarios/{document=**} {
+      allow read, write: if false;
+    }
+    match /semantic_groups/{document=**} {
+      allow read, write: if false;
+    }
+    match /scenario_semantic_groups/{document=**} {
+      allow read, write: if false;
+    }
+    match /scenario_games/{document=**} {
+      allow read, write: if false;
+    }
+
+    // Публичные агрегаты: read-only для клиентов (A-10, A-12).
+    match /home_feed/{document=**} {
+      allow read: if true;
+      allow write: if false;
+    }
+    match /semantic_groups_public/{document=**} {
+      allow read: if true;
+      allow write: if false;
+    }
+    match /scenario_public/{document=**} {
+      allow read: if true;
+      allow write: if false;
+    }
+    match /game_public/{document=**} {
+      allow read: if true;
+      allow write: if false;
+    }
+    match /sitemap_public/{document=**} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // Любые другие пути — закрыты по умолчанию (fail-closed).
     match /{document=**} {
       allow read, write: if false;
     }
