@@ -1,0 +1,38 @@
+name: Supabase Keep-Alive
+
+# Keep-alive для free-tier Supabase (dev + prod): ежедневный запрос к БД через
+# PostgREST, чтобы проекты не попадали под авто-паузу после 7 дней без активности.
+#
+# Требования:
+# - GitHub Secrets: SUPABASE_URL_DEV, SUPABASE_ANON_KEY_DEV,
+#   SUPABASE_URL_PROD, SUPABASE_ANON_KEY_PROD.
+#   Anon keys — публичные клиентские ключи (лежат в .env.local / бандле),
+#   секрет не критичен, но храним в secrets для единообразия с daily-push.
+#
+# Ограничение GitHub: cron отключается для репозиториев без активности 60 дней.
+
+on:
+  schedule:
+    # 06:00 UTC = 09:00 МСК (Europe/Moscow, UTC+3)
+    - cron: '0 6 * * *'
+  workflow_dispatch: {} # ручной запуск для проверки
+
+jobs:
+  supabase-keepalive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Run keep-alive
+        env:
+          SUPABASE_URL_DEV: ${{ secrets.SUPABASE_URL_DEV }}
+          SUPABASE_ANON_KEY_DEV: ${{ secrets.SUPABASE_ANON_KEY_DEV }}
+          SUPABASE_URL_PROD: ${{ secrets.SUPABASE_URL_PROD }}
+          SUPABASE_ANON_KEY_PROD: ${{ secrets.SUPABASE_ANON_KEY_PROD }}
+        run: node scripts/supabase-keepalive.mjs
