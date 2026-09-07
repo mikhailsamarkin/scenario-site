@@ -9,7 +9,6 @@ name: Daily Push (11:00 MSK)
 #   Создать: Firebase Console → Project settings → Service accounts → Generate new private key.
 #   Роли: Cloud Functions Admin не нужен; достаточно чтения Firestore + отправки FCM
 #   (роль Firebase Admin / Cloud Messaging Admin).
-# - FCM_TOPIC (опционально, default 'daily').
 #
 # Ограничение GitHub: cron отключается для репозиториев без активности 60 дней.
 
@@ -47,5 +46,4 @@ jobs:
       - name: Run daily push
         env:
           GOOGLE_APPLICATION_CREDENTIALS: /tmp/firebase-sa.json
-          FCM_TOPIC: ${{ vars.FCM_TOPIC }}
         run: node scripts/daily-push.mjs
