@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { getDb } from '../../../lib/firebase';
-import { getGame } from '../../../lib/contract/repository';
+import { getGame, getSitemap } from '../../../lib/contract/repository';
 import { GamePublic } from '../../../lib/contract/types';
 import SupabaseImage from '../../../components/SupabaseImage';
 
@@ -33,16 +33,25 @@ export default function GameClient({ slug }: { slug: string }) {
       setError('Firebase не настроен (проверьте NEXT_PUBLIC_FIREBASE_* в .env.local)');
       return;
     }
-    getGame(db, slug)
+    // slug → id из sitemap (A-23/A-24), затем чтение game_public/{id}.
+    getSitemap(db)
+      .then((sitemap) => {
+        const entry = sitemap?.gameEntries.find((e) => e.slug === slug);
+        if (!entry) {
+          setError(`Игра ${slug} не найдена`);
+          return null;
+        }
+        return getGame(db, entry.id);
+      })
       .then((doc) => {
         if (doc) {
           setGame(doc);
-        } else {
+        } else if (!error) {
           setError(`Игра ${slug} не найдена`);
         }
       })
       .catch((e) => setError(String(e)));
-  }, [slug]);
+  }, [slug, error]);
 
   if (error) {
     return (

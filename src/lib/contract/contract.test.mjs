@@ -44,6 +44,6 @@ test('имена коллекций соответствуют СТ §4', () => 
   assert.equal(PublicCollections.sitemapPublic, 'sitemap_public');
 });
 
-test('версия контракта = 1', () => {
-  assert.equal(CONTENT_CONTRACT_VERSION, 1);
+test('версия контракта = 2', () => {
+  assert.equal(CONTENT_CONTRACT_VERSION, 2);
 });

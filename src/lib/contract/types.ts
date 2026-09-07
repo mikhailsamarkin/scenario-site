@@ -15,12 +15,7 @@ export type PlayersHint =
   | 'players_5_plus';
 
 /** Длительность партии (CR-4.1 п.2). */
-export type DurationBucket =
-  | 'warmup'
-  | 'short'
-  | 'evening'
-  | 'long'
-  | 'main_event';
+export type DurationBucket = 'warmup' | 'short' | 'evening' | 'long' | 'main_event';
 
 /** Аудитория по возрасту (CR-4.1 п.3). */
 export type AgeHint = 'age_kids' | 'age_family' | 'age_adults';
@@ -29,11 +24,7 @@ export type AgeHint = 'age_kids' | 'age_family' | 'age_adults';
 export type RulesComplexity = 'easy' | 'normal' | 'heavy';
 
 /** Тип кадра слайда карусели (CR-5). */
-export type FrameType =
-  | 'teaser'
-  | 'box'
-  | 'in_play'
-  | 'mechanic_closeup';
+export type FrameType = 'teaser' | 'box' | 'in_play' | 'mechanic_closeup';
 
 /** Слайд карусели (CR-5). */
 export interface Slide {
@@ -139,13 +130,19 @@ export interface GamePublic {
   updatedAt: string;
 }
 
-/** Публичный агрегат `sitemap_public/main` (§4.6). */
+/** Пара «slug, id» опубликованного сценария/игры для SSG (A-10b, A-10d. */
+export interface SitemapEntry {
+  slug: string;
+  id: string;
+}
+
+/** Публичный агрегат `sitemap_public/main` (§4.6. */
 export interface SitemapPublic {
-  scenarioSlugs: string[];
-  gameSlugs: string[];
+  scenarioEntries: SitemapEntry[];
+  gameEntries: SitemapEntry[];
   contentVersion: number;
   updatedAt: string;
 }
 
 /** Версия контракта данных (A-44). */
-export const CONTENT_CONTRACT_VERSION = 1;
+export const CONTENT_CONTRACT_VERSION = 2;
