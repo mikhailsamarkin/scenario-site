@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { getDb } from '../../../lib/firebase';
 import { getScenario, getSitemap } from '../../../lib/contract/repository';
+import { supabasePublicUrl } from '../../../lib/supabase';
 import ScenarioClient from './ScenarioClient';
 
 // Список опубликованных сценариев (slug + id) из `sitemap_public/main` (A-10b.
@@ -16,6 +17,7 @@ export async function generateStaticParams() {
 type Props = { params: { slug: string } };
 
 // Метаданные из `scenario_public/{id}` (US-E1-04, SR-SEO-1. slug → id из sitemap.
+// OG-теги (US-E5-03): og:title/og:description/og:image из полей шаринга.
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const db = getDb();
   if (!db) return { title: params.slug };
@@ -24,9 +26,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!entry) return { title: params.slug };
   const scenario = await getScenario(db, entry.id);
   if (!scenario) return { title: params.slug };
+  const title = scenario.shareTitle ?? scenario.seoTitle ?? scenario.title;
+  const description = scenario.shareText ?? scenario.seoDescription ?? scenario.whyTheseGames;
   return {
     title: scenario.seoTitle ?? scenario.title,
     description: scenario.seoDescription,
+    openGraph: {
+      title,
+      description,
+      ...(scenario.shareImageUrl ? { images: [supabasePublicUrl(scenario.shareImageUrl)] } : {}),
+    },
   };
 }
 

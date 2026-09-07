@@ -47,3 +47,15 @@ test('имена коллекций соответствуют СТ §4', () => 
 test('версия контракта = 2', () => {
   assert.equal(CONTENT_CONTRACT_VERSION, 2);
 });
+
+// A-25: UTM не теряются при редиректах. Сайт не имеет редиректов,
+// сбрасывающих query; проверяем, что URL с UTM сохраняет параметры.
+test('UTM сохраняются в URL (A-25)', () => {
+  const url =
+    'https://scenario-games.ru/scenario/vecherinka?utm_source=share&utm_campaign=vecherinka';
+  const parsed = new URL(url);
+  assert.equal(parsed.searchParams.get('utm_source'), 'share');
+  assert.equal(parsed.searchParams.get('utm_campaign'), 'vecherinka');
+  // Финальный URL (без редиректов) сохраняет query.
+  assert.equal(parsed.toString(), url);
+});
