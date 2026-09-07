@@ -15,7 +15,9 @@ import {initializeApp, cert, getApps} from 'firebase-admin/app';
 import {getFirestore} from 'firebase-admin/firestore';
 import {getMessaging} from 'firebase-admin/messaging';
 
-const FCM_TOPIC = process.env.FCM_TOPIC ?? 'daily';
+// FCM_TOPIC — env; если переменная не задана или пустая строка (например,
+// в CI vars.FCM_TOPIC не установлен) — fallback на 'daily' (||, а не ??).
+const FCM_TOPIC = process.env.FCM_TOPIC?.trim() || 'daily';
 
 function getAdminApp() {
   if (getApps().length > 0) return getApps()[0];
