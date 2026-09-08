@@ -6,6 +6,7 @@ import { getDb } from '../../../lib/firebase';
 import { getScenario, getSitemap } from '../../../lib/contract/repository';
 import { ScenarioPublic } from '../../../lib/contract/types';
 import SupabaseImage from '../../../components/SupabaseImage';
+import InstallCta from '../../../components/InstallCta';
 
 export default function ScenarioClient({ slug }: { slug: string }) {
   const [scenario, setScenario] = useState<ScenarioPublic | null>(null);
@@ -56,6 +57,7 @@ export default function ScenarioClient({ slug }: { slug: string }) {
   return (
     <main style={{ padding: '2rem', maxWidth: 800, margin: '0 auto' }}>
       <h1>Сценарий: {scenario.title}</h1>
+      <InstallCta />
       {scenario.whyTheseGames && <p style={{ whiteSpace: 'pre-wrap' }}>{scenario.whyTheseGames}</p>}
       {scenario.games && scenario.games.length > 0 && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>

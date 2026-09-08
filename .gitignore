@@ -12,3 +12,7 @@ next-env.d.ts
 dataconnect/
 src/dataconnect-generated/
 src/dataconnect-admin-generated/
+
+# Логи (эмулятор Firestore и пр.) — мусор, не коммитить (A-40)
+*.log
+firestore-debug.log

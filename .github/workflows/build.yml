@@ -1,0 +1,61 @@
+name: Build SSG Site
+
+# Предсказуемый билд SSG из опубликованных данных (SP-E4-04, A-10b, ED-10).
+# Полный rebuild по ручному триггеру (workflow_dispatch). Читает агрегаты
+# через клиентский Firebase SDK; число чтений на URL — в бюджете A-10b.
+#
+# Требования (GitHub Secrets):
+# - NEXT_PUBLIC_ENV: dev или prod
+# - NEXT_PUBLIC_FIREBASE_API_KEY[_PROD]
+# - NEXT_PUBLIC_FIREBASE_PROJECT_ID[_PROD]
+# - NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN[_PROD]
+# - NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET[_PROD]
+# - NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID[_PROD]
+# - NEXT_PUBLIC_FIREBASE_APP_ID[_PROD]
+# - NEXT_PUBLIC_SUPABASE_URL[_PROD], NEXT_PUBLIC_SUPABASE_ANON_KEY[_PROD]
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build SSG
+        env:
+          NEXT_PUBLIC_ENV: ${{ secrets.NEXT_PUBLIC_ENV }}
+          NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}
+          NEXT_PUBLIC_FIREBASE_API_KEY_PROD: ${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY_PROD }}
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID_PROD: ${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID_PROD }}
+          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ secrets.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }}
+          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN_PROD: ${{ secrets.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN_PROD }}
+          NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: ${{ secrets.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET }}
+          NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET_PROD: ${{ secrets.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET_PROD }}
+          NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID }}
+          NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID_PROD: ${{ secrets.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID_PROD }}
+          NEXT_PUBLIC_FIREBASE_APP_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID }}
+          NEXT_PUBLIC_FIREBASE_APP_ID_PROD: ${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID_PROD }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_URL_PROD: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL_PROD }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY_PROD: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY_PROD }}
+        run: npm run build
+
+      - name: Run Lighthouse CI (Core Web Vitals)
+        uses: treosh/lighthouse-ci-action@v12
+        with:
+          configPath: './lighthouserc.js'
+          temporaryPublicStorage: true
+          uploadArtifacts: true

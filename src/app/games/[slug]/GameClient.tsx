@@ -6,6 +6,7 @@ import { getDb } from '../../../lib/firebase';
 import { getGame, getSitemap } from '../../../lib/contract/repository';
 import { GamePublic } from '../../../lib/contract/types';
 import SupabaseImage from '../../../components/SupabaseImage';
+import InstallCta from '../../../components/InstallCta';
 
 // Подпись на русском для durationBucket (ED-2.
 const DURATION_LABELS: Record<string, string> = {
@@ -80,6 +81,7 @@ export default function GameClient({ slug }: { slug: string }) {
     <main style={{ padding: '2rem', maxWidth: 800, margin: '0 auto' }}>
       <Link href="/scenarios">← К сценариям</Link>
       <h1>{game.title}</h1>
+      <InstallCta />
       <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
         {characteristics.map((c, i) => (
           <span
