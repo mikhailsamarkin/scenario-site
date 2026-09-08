@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { getDb } from '../../../lib/firebase';
 import { getScenario, getSitemap } from '../../../lib/contract/repository';
 import { supabasePublicUrl } from '../../../lib/supabase';
-import ScenarioClient from './ScenarioClient';
+import ScenarioView from './ScenarioView';
 
 // Список опубликованных сценариев (slug + id) из `sitemap_public/main` (A-10b.
 // URL — ЧПУ по slug (A-23); чтение — по id (A-24, A-13. Без N+1 (A-10d.
@@ -39,6 +39,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default function ScenarioPage({ params }: Props) {
-  return <ScenarioClient slug={params.slug} />;
+// Контент рендерится на сервере (SSG) — доступен для индексации (SR-SEO-1).
+export default async function ScenarioPage({ params }: Props) {
+  const db = getDb();
+  if (!db) {
+    return <main>Сценарий недоступен</main>;
+  }
+  const sitemap = await getSitemap(db);
+  const entry = sitemap?.scenarioEntries.find((e) => e.slug === params.slug);
+  if (!entry) {
+    return <main>Сценарий {params.slug} не найден</main>;
+  }
+  const scenario = await getScenario(db, entry.id);
+  if (!scenario) {
+    return <main>Сценарий {params.slug} не найден</main>;
+  }
+  return <ScenarioView scenario={scenario} />;
 }

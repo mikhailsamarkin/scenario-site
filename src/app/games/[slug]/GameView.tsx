@@ -1,9 +1,9 @@
-'use client';
+// Рендер игры (SP-E4-01, SR-SEO-1).
+//
+// Серверный компонент: получает данные `game_public/{id}` из page.tsx
+// (SSG), рендерит контент в статический HTML — доступен для индексации.
 
-import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { getDb } from '../../../lib/firebase';
-import { getGame, getSitemap } from '../../../lib/contract/repository';
 import { GamePublic } from '../../../lib/contract/types';
 import SupabaseImage from '../../../components/SupabaseImage';
 import InstallCta from '../../../components/InstallCta';
@@ -24,52 +24,7 @@ const RULES_LABELS: Record<string, string> = {
   heavy: 'Сложные правила',
 };
 
-export default function GameClient({ slug }: { slug: string }) {
-  const [game, setGame] = useState<GamePublic | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const db = getDb();
-    if (!db) {
-      setError('Firebase не настроен (проверьте NEXT_PUBLIC_FIREBASE_* в .env.local)');
-      return;
-    }
-    // slug → id из sitemap (A-23/A-24), затем чтение game_public/{id}.
-    getSitemap(db)
-      .then((sitemap) => {
-        const entry = sitemap?.gameEntries.find((e) => e.slug === slug);
-        if (!entry) {
-          setError(`Игра ${slug} не найдена`);
-          return null;
-        }
-        return getGame(db, entry.id);
-      })
-      .then((doc) => {
-        if (doc) {
-          setGame(doc);
-        } else if (!error) {
-          setError(`Игра ${slug} не найдена`);
-        }
-      })
-      .catch((e) => setError(String(e)));
-  }, [slug, error]);
-
-  if (error) {
-    return (
-      <main style={{ padding: '2rem', maxWidth: 800, margin: '0 auto' }}>
-        <p style={{ color: 'red' }}>{error}</p>
-        <Link href="/scenarios">← К сценариям</Link>
-      </main>
-    );
-  }
-  if (!game) {
-    return (
-      <main style={{ padding: '2rem', maxWidth: 800, margin: '0 auto' }}>
-        <p>Загрузка…</p>
-      </main>
-    );
-  }
-
+export default function GameView({ game }: { game: GamePublic }) {
   const characteristics = [
     `${game.playersHint} игрок`,
     DURATION_LABELS[game.durationBucket] ?? game.durationBucket,
