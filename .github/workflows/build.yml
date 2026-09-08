@@ -54,8 +54,19 @@ jobs:
         run: npm run build
 
       - name: Run Lighthouse CI (Core Web Vitals)
-        uses: treosh/lighthouse-ci-action@v12
-        with:
-          configPath: './lighthouserc.js'
-          temporaryPublicStorage: true
-          uploadArtifacts: true
+        run: |
+          # Запуск статического сервера на собранном out/ (output: export).
+          npx serve out -l 3000 &
+          SERVER_PID=$!
+          # Ждём готовности сервера (до 30 сек).
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:3000/scenarios > /dev/null 2>&1; then
+              break
+            fi
+            sleep 1
+          done
+          # Lighthouse CI: измерение CWV на ключевых шаблонах.
+          npx --yes @lhci/cli@0.14.x autorun --config=./lighthouserc.js
+          EXIT_CODE=$?
+          kill $SERVER_PID 2>/dev/null || true
+          exit $EXIT_CODE

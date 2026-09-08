@@ -9,7 +9,8 @@ module.exports = {
     collect: {
       url: [
         'http://localhost:3000/scenarios',
-        'http://localhost:3000/games',
+        'http://localhost:3000/scenarios/semya',
+        'http://localhost:3000/games/codenames',
       ],
       numberOfRuns: 3,
     },
