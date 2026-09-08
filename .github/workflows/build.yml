@@ -17,12 +17,26 @@ name: Build SSG Site
 on:
   workflow_dispatch: {}
 
+# GitHub Pages: деплой собранного out/ (US-E8-06, ED-3).
+# Требует включённого Pages в настройках репозитория (Source: GitHub Actions).
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -70,3 +84,12 @@ jobs:
           EXIT_CODE=$?
           kill $SERVER_PID 2>/dev/null || true
           exit $EXIT_CODE
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: out
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
