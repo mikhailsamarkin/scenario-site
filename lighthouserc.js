@@ -2,15 +2,19 @@
 //
 // Измеряет Core Web Vitals (LCP, INP, CLS) на ключевых шаблонах —
 // страницах сценария и игры. Пороги — ориентировочные; согласовать с §13.1.
-// Запускается в CI после сборки (build.yml).
+// Запускается в CI после сборки (build.yml). Базовый путь выкладки
+// (GH Pages project site) учитывается через NEXT_PUBLIC_BASE_PATH.
+
+const rawBasePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
+const basePath = rawBasePath === '/' ? '' : rawBasePath;
 
 module.exports = {
   ci: {
     collect: {
       url: [
-        'http://localhost:3000/scenarios',
-        'http://localhost:3000/scenarios/semya',
-        'http://localhost:3000/games/codenames',
+        `http://localhost:3000${basePath}/scenarios`,
+        `http://localhost:3000${basePath}/scenario/semya`,
+        `http://localhost:3000${basePath}/games/codenames`,
       ],
       numberOfRuns: 3,
     },

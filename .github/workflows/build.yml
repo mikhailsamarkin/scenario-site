@@ -36,6 +36,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Pages
+        id: pages
         uses: actions/configure-pages@v5
 
       - name: Setup Node
@@ -49,6 +50,8 @@ jobs:
       - name: Build SSG
         env:
           NEXT_PUBLIC_ENV: ${{ secrets.NEXT_PUBLIC_ENV }}
+          # Базовый путь GH Pages project site (US-E8-06, ED-3).
+          NEXT_PUBLIC_BASE_PATH: ${{ steps.pages.outputs.base_path }}
           NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}
           NEXT_PUBLIC_FIREBASE_API_KEY_PROD: ${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY_PROD }}
           NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
@@ -68,13 +71,22 @@ jobs:
         run: npm run build
 
       - name: Run Lighthouse CI (Core Web Vitals)
+        env:
+          NEXT_PUBLIC_BASE_PATH: ${{ steps.pages.outputs.base_path }}
         run: |
-          # Запуск статического сервера на собранном out/ (output: export).
-          npx serve out -l 3000 &
+          # Монтируем собранный out/ под базовый путь, чтобы абсолютные
+          # ссылки /<basePath>/_next/... резолвились (US-E8-06).
+          BASE_PATH="${NEXT_PUBLIC_BASE_PATH:-}"
+          if [ "$BASE_PATH" = "/" ]; then BASE_PATH=""; fi
+          SERVE_ROOT="lh-root"
+          mkdir -p "$SERVE_ROOT$BASE_PATH"
+          cp -r out/. "$SERVE_ROOT$BASE_PATH/"
+          # Запуск статического сервера (output: export).
+          npx serve "$SERVE_ROOT" -l 3000 &
           SERVER_PID=$!
           # Ждём готовности сервера (до 30 сек).
           for i in $(seq 1 30); do
-            if curl -sf http://localhost:3000/scenarios > /dev/null 2>&1; then
+            if curl -sf "http://localhost:3000$BASE_PATH/scenarios" > /dev/null 2>&1; then
               break
             fi
             sleep 1
