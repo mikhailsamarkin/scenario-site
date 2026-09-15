@@ -1,10 +1,16 @@
 name: Supabase Keep-Alive
 
-# Keep-alive для free-tier Supabase (dev + prod): ежедневный запрос к БД через
-# Storage API (POST /storage/v1/object/list/games), чтобы проекты не попадали
-# под авто-паузу после 7 дней без активности.
+# Keep-alive для free-tier Supabase (dev + prod): ежедневный пользовательский
+# запрос к БД через PostgREST (GET /rest/v1/keepalive?select=id&limit=1), чтобы
+# проекты не попадали под авто-паузу после 7 дней без активности.
+#
+# Важно: Supabase считает активностью только user database activity (PostgREST
+# запросы к таблице exposed-схемы public). Запросы к Storage API (/storage/…),
+# Auth и Management API в метрику не входят — на одном Storage-пинге проект
+# всё равно уходил в паузу.
 #
 # Требования:
+# - Таблица public.keepalive в обоих проектах (см. scripts/supabase-keepalive.mjs).
 # - GitHub Secrets: SUPABASE_URL_DEV, SUPABASE_ANON_KEY_DEV,
 #   SUPABASE_URL_PROD, SUPABASE_ANON_KEY_PROD.
 #   Anon keys — публичные клиентские ключи (лежат в .env.local / бандле),
