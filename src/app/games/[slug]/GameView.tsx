@@ -34,7 +34,7 @@ export default function GameView({ game }: { game: GamePublic }) {
 
   return (
     <main style={{ padding: '2rem', maxWidth: 800, margin: '0 auto' }}>
-      <Link href="/scenarios">← К сценариям</Link>
+      <Link href="/games">← К списку игр</Link>
       <h1>{game.title}</h1>
       <InstallCta />
       <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
@@ -73,7 +73,7 @@ export default function GameView({ game }: { game: GamePublic }) {
           <ul>
             {game.scenarios.map((sc, i) => (
               <li key={i}>
-                <Link href={`/scenarios/${sc.slug}`}>{sc.title}</Link>
+                <Link href={`/scenario/${sc.slug}`}>{sc.title}</Link>
               </li>
             ))}
           </ul>

@@ -16,7 +16,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Link href="/" style={{ fontWeight: 'bold', marginRight: '1rem' }}>
             Scenario
           </Link>
-          <Link href="/scenarios">Сценарии</Link>
+          <Link href="/scenarios" style={{ marginRight: '1rem' }}>
+            Сценарии
+          </Link>
+          <Link href="/games">Игры</Link>
           <div style={{ marginLeft: 'auto', display: 'flex', gap: '1rem' }}>
             <InstallCta />
           </div>
