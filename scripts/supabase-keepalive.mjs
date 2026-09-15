@@ -1,5 +1,5 @@
 // Keep-alive для free-tier Supabase (dev + prod).
-// Запускается GitHub Actions cron (supabase-keepalive.yml) ежедневно.
+// Запускается GitHub Actions cron (supabase-keepalive.yml) каждые 6 часов.
 //
 // Логика:
 //   1. Для каждого окружения (dev, prod) выполняем GET /rest/v1/<таблица>?select=id&limit=1
