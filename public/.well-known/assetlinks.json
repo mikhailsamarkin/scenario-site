@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.scenario.scenario",
+      "sha256_cert_fingerprints": [
+        "8C:FA:A5:58:78:C3:A6:A4:99:2C:F9:AD:36:23:42:E2:EA:B1:39:F7:F0:11:3E:8E:A3:53:15:39:3D:D6:A0:1C"
+      ]
+    }
+  }
+]
